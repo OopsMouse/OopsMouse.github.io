@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Wannabe Notes]]></title>
+  <link href="http://OopsMouse.github.io/atom.xml" rel="self"/>
+  <link href="http://OopsMouse.github.io/"/>
+  <updated>2013-11-14T22:11:50+09:00</updated>
+  <id>http://OopsMouse.github.io/</id>
+  <author>
+    <name><![CDATA[Noda Shimpei]]></name>
+    <email><![CDATA[node.sin@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[dyld: Symbol not found: __ZTISt9exceptionではまった]]></title>
+    <link href="http://OopsMouse.github.io/blog/2013/11/14/title/"/>
+    <updated>2013-11-14T20:59:00+09:00</updated>
+    <id>http://OopsMouse.github.io/blog/2013/11/14/title</id>
+    <content type="html"><![CDATA[<p>やっとこさアプリのios7対応をしようとしていたときにハマったことをメモ</p>
+
+<p>今までxcode4.6.xで開発をしていたプロジェクトを新しいxcode5.0で開き、<br/>
+Development Targetをios7にしてビルド。</p>
+
+<p>UIのずれなどをios7上の実機で確認をしながら一通りの修正は終了し、<br/>
+念のためios6でも変わらず使えるかな？っと確認しようとビルドしたら、エラーが！Σ(ﾟДﾟ|||)</p>
+
+<pre><code>dyld: Symbol not found: __ZTISt9exception
+  Referenced from: /var/mobile/Applications/86566E4B-B2E1-4691-BF65-2AE486EF247F/Sample.app/Sample
+  Expected in: /usr/lib/libc++abi.dylib
+  in /var/mobile/Applications/86566E4B-B2E1-4691-BF65-2AE486EF247F/Sample.app/Sample
+</code></pre>
+
+<p>「 直訳するとlibc++api.dylibで期待されて__ZTISt9exceptionってやつが見つからないよ！ 」って言っているんだけどさっぱり分からない。<br/>
+調べても情報ないし、__ZTISt9exceptionがそもそも何のためのクラスなのか分からないし、どうしようもない。。。<br/>
+だめもとで、frameworkのlibc++api.dylibの項目を<strong>optional</strong>に変更してビルドしたら、ios7でもios6でも動くようになった。 <br/>
+これでいいのか？</p>
+]]></content>
+  </entry>
+  
+</feed>
