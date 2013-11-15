@@ -4,7 +4,7 @@
   <title><![CDATA[Wannabe Notes]]></title>
   <link href="http://OopsMouse.github.io/atom.xml" rel="self"/>
   <link href="http://OopsMouse.github.io/"/>
-  <updated>2013-11-14T22:28:22+09:00</updated>
+  <updated>2013-11-15T14:38:56+09:00</updated>
   <id>http://OopsMouse.github.io/</id>
   <author>
     <name><![CDATA[Noda Shimpei]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Objective-Cで、UniversalなStatic Libraryを作る方法]]></title>
+    <link href="http://OopsMouse.github.io/blog/2013/11/15/title/"/>
+    <updated>2013-11-15T14:24:00+09:00</updated>
+    <id>http://OopsMouse.github.io/blog/2013/11/15/title</id>
+    <content type="html"><![CDATA[<p>iPhone, iPadともに64bitのデバイスが登場し、既存の自作静的ライブラリも新しいアーキテクチャに対応しなければならない。Xcodeは、デフォルトで１つのアーキテクチャに対応したバイナリを吐き出す仕組みになっていて、対応したいアーキテクチャの数だけバイナリができてしまう。これらを１つのバイナリに集約させる方法はないのだろうか？と思って、調べたときのメモ。<br/>
+Xcodeにlipoというコマンドがついていて、これを使うとユニバーサルなバイナリを作れるらしい。一応、ユニバーサルなバイナリを自動で吐き出してくれるようなスクリプトを書いた。</p>
+
+<pre><code>#!/bin/sh
+
+for project in *.xcodeproj; do
+    if [ -e $project ]; then
+        targetname="`basename $project .xcodeproj`"
+
+        xcodebuild -project $project -configuration Release -sdk iphoneos -target $targetname clean build ARCHS="armv7" IPHONEOS_DEPLOYMENT_TARGET='4.3' TARGET_BUILD_DIR='./build-arm' BUILD_PRODUCT_DIR='./build-arm' &gt; /dev/null
+        xcodebuild -project $project -configuration Release -sdk iphoneos -target $targetname clean build ARCHS="armv7s" IPHONEOS_DEPLOYMENT_TARGET='4.3' TARGET_BUILD_DIR='./build-armv7s' BUILD_PRODUCT_DIR='./build-armv7s' &gt; /dev/null
+        xcodebuild -project $project -configuration Release -sdk iphoneos -target $targetname clean build ARCHS="arm64" IPHONEOS_DEPLOYMENT_TARGET='7.0' TARGET_BUILD_DIR='./build-arm64' BUILD_PRODUCT_DIR='./build-arm64' &gt; /dev/null
+        xcodebuild -project $project -configuration Release -sdk iphonesimulator -target $targetname clean build ARCHS="i386" IPHONEOS_DEPLOYMENT_TARGET='4.3' TARGET_BUILD_DIR='./build-i386' BUILD_PRODUCT_DIR='./build-i386' &gt; /dev/null
+        xcodebuild -project $project -configuration Release -sdk iphonesimulator -target $targetname clean build ARCHS="x86_64" VALID_ARCHS="armv7 armv7s arm64 i386 x86_64" IPHONEOS_DEPLOYMENT_TARGET='4.3' TARGET_BUILD_DIR='./build-x86_64' BUILD_PRODUCT_DIR='./build-x86_64' &gt; /dev/null
+        lipo -create ./build-arm/$targetname.a ./build-armv7s/$targetname.a ./build-arm64/$targetname.a ./build-i386/$targetname.a ./build-x86_64/$targetname.a -output "${targetname}.a"
+        xcrun -sdk iphoneos lipo -info $targetname.a
+
+        rm -rf ./build-arm
+        rm -rf ./build-armv7s
+        rm -rf ./build-arm64
+        rm -rf ./build-i386
+        rm -rf ./build-x86_64
+
+        if [ -e ./$targetname.a ]; then
+            echo '** BUILD SUCCEEDED **'
+        else
+            echo '** BUILD FAILED **'
+        fi
+    fi
+done
+</code></pre>
+
+<p>プロジェクトファイルがあるフォルダでこれを実行すると、同フォルダにユニバーサルなバイナリが吐き出される。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[dyld: Symbol not found: __ZTISt9exceptionではまった]]></title>
