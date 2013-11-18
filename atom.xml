@@ -4,7 +4,7 @@
   <title><![CDATA[Wannabe Notes]]></title>
   <link href="http://OopsMouse.github.io/atom.xml" rel="self"/>
   <link href="http://OopsMouse.github.io/"/>
-  <updated>2013-11-18T21:46:52+09:00</updated>
+  <updated>2013-11-18T21:54:45+09:00</updated>
   <id>http://OopsMouse.github.io/</id>
   <author>
     <name><![CDATA[Noda Shimpei]]></name>
@@ -25,6 +25,7 @@
 [urlComponents setHost:@"www.google.com"];
 [urlComponents setPath:@"/path"];
 [urlComponents setQuery:@"query=vlue"];
+NSURL *url = [urlComponents URL];
 </code></pre>
 
 <p>が、どうもクエリーストリングを設定するところが、汚い。。。ので、すこし綺麗に書けるようにNSURLComponentsのカテゴリを作成した。</p>
@@ -74,6 +75,7 @@
 [urlComponents setHost:@"www.google.com"];
 [urlComponents setPath:@"/path"];
 [urlComponents setQueryDictonary:@{@"key1": @"value1", @"key2": @"value2"}];
+NSURL *url = [urlComponents URL];
 </code></pre>
 ]]></content>
   </entry>

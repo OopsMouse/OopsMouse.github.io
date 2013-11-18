@@ -132,6 +132,7 @@
 [urlComponents setHost:@"www.google.com"];
 [urlComponents setPath:@"/path"];
 [urlComponents setQuery:@"query=vlue"];
+NSURL *url = [urlComponents URL];
 </code></pre>
 
 <p>が、どうもクエリーストリングを設定するところが、汚い。。。ので、すこし綺麗に書けるようにNSURLComponentsのカテゴリを作成した。</p>
@@ -181,6 +182,7 @@
 [urlComponents setHost:@"www.google.com"];
 [urlComponents setPath:@"/path"];
 [urlComponents setQueryDictonary:@{@"key1": @"value1", @"key2": @"value2"}];
+NSURL *url = [urlComponents URL];
 </code></pre>
 
 		
