@@ -9,7 +9,7 @@
 	<meta name="author" content="Noda Shimpei">
 
 	
-	<meta name="description" content="Nov 15th, 2013 ios Objective-Cで、UniversalなStatic Libraryを作る方法 iPhone, iPadともに64bitのデバイスが登場し、既存の自作静的ライブラリも新しいアーキテクチャに対応しなければならない。Xcodeは、 &hellip;">
+	<meta name="description" content="Nov 18th, 2013 ios NSURLComponentsの使い方 iOS7からNSDateComponentsのように、NSURLのフォーマットを決めるNSURLComponentsというクラスが追加された。下記のようにURLを定義する部分がすっきりかける。 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -97,6 +97,97 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-18T20:49:00+09:00" data-updated="true" itemprop="datePublished">Nov 18<span>th</span>, 2013</time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2013/11/18/title/" itemprop="url">NSURLComponentsの使い方</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>iOS7からNSDateComponentsのように、NSURLのフォーマットを決めるNSURLComponentsというクラスが追加された。下記のようにURLを定義する部分がすっきりかける。</p>
+
+<pre><code>NSURLComponents *urlComponents = [NSURLComponents new];
+[urlComponents setScheme:@"https"];
+[urlComponents setHost:@"www.google.com"];
+[urlComponents setPath:@"/path"];
+[urlComponents setQuery:@"query=vlue"];
+</code></pre>
+
+<p>が、どうもクエリーストリングを設定するところが、汚い。。。ので、すこし綺麗に書けるようにNSURLComponentsのカテゴリを作成した。</p>
+
+<pre><code>@interface NSURLComponents (addon)
+
+- (void)setQueryDictonary:(NSDictionary *)dict;
+
+@end
+
+@implementation NSURLComponents (addon)
+
+- (void)setQueryDictonary:(NSDictionary *)dict {
+    __block NSString *queryString = nil;
+    [dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([key isKindOfClass:[NSString class]] &amp;&amp; ![obj isKindOfClass:[NSNull class]]) {
+            id value;
+            if ([obj isKindOfClass:[NSString class]]) {
+                value = obj;
+            } else {
+                value = [obj description];
+            }
+
+            if (value == nil) {
+                return;
+            }
+
+            if (!queryString) {
+                queryString = @"";
+            } else {
+                queryString = [queryString stringByAppendingString:@"&amp;"];
+            }
+
+            queryString = [queryString stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, value]];
+        }
+    }];
+    [self setQuery:queryString];
+}
+
+@end
+</code></pre>
+
+<p>具体的な使い方は、下記のようになる。</p>
+
+<pre><code>NSURLComponents *urlComponents = [NSURLComponents new];
+[urlComponents setScheme:@"https"];
+[urlComponents setHost:@"www.google.com"];
+[urlComponents setPath:@"/path"];
+[urlComponents setQueryDictonary:@{@"key1": @"value1", @"key2": @"value2"}];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">

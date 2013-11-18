@@ -4,7 +4,7 @@
   <title><![CDATA[Wannabe Notes]]></title>
   <link href="http://OopsMouse.github.io/atom.xml" rel="self"/>
   <link href="http://OopsMouse.github.io/"/>
-  <updated>2013-11-15T14:38:56+09:00</updated>
+  <updated>2013-11-18T21:45:46+09:00</updated>
   <id>http://OopsMouse.github.io/</id>
   <author>
     <name><![CDATA[Noda Shimpei]]></name>
@@ -12,6 +12,71 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[NSURLComponentsの使い方]]></title>
+    <link href="http://OopsMouse.github.io/blog/2013/11/18/title/"/>
+    <updated>2013-11-18T20:49:00+09:00</updated>
+    <id>http://OopsMouse.github.io/blog/2013/11/18/title</id>
+    <content type="html"><![CDATA[<p>iOS7からNSDateComponentsのように、NSURLのフォーマットを決めるNSURLComponentsというクラスが追加された。下記のようにURLを定義する部分がすっきりかける。</p>
+
+<pre><code>NSURLComponents *urlComponents = [NSURLComponents new];
+[urlComponents setScheme:@"https"];
+[urlComponents setHost:@"www.google.com"];
+[urlComponents setPath:@"/path"];
+[urlComponents setQuery:@"query=vlue"];
+</code></pre>
+
+<p>が、どうもクエリーストリングを設定するところが、汚い。。。ので、すこし綺麗に書けるようにNSURLComponentsのカテゴリを作成した。</p>
+
+<pre><code>@interface NSURLComponents (addon)
+
+- (void)setQueryDictonary:(NSDictionary *)dict;
+
+@end
+
+@implementation NSURLComponents (addon)
+
+- (void)setQueryDictonary:(NSDictionary *)dict {
+    __block NSString *queryString = nil;
+    [dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([key isKindOfClass:[NSString class]] &amp;&amp; ![obj isKindOfClass:[NSNull class]]) {
+            id value;
+            if ([obj isKindOfClass:[NSString class]]) {
+                value = obj;
+            } else {
+                value = [obj description];
+            }
+
+            if (value == nil) {
+                return;
+            }
+
+            if (!queryString) {
+                queryString = @"";
+            } else {
+                queryString = [queryString stringByAppendingString:@"&amp;"];
+            }
+
+            queryString = [queryString stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, value]];
+        }
+    }];
+    [self setQuery:queryString];
+}
+
+@end
+</code></pre>
+
+<p>具体的な使い方は、下記のようになる。</p>
+
+<pre><code>NSURLComponents *urlComponents = [NSURLComponents new];
+[urlComponents setScheme:@"https"];
+[urlComponents setHost:@"www.google.com"];
+[urlComponents setPath:@"/path"];
+[urlComponents setQueryDictonary:@{@"key1": @"value1", @"key2": @"value2"}];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Objective-Cで、UniversalなStatic Libraryを作る方法]]></title>
