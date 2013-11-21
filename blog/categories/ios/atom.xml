@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ios | Wannabe Notes]]></title>
   <link href="http://OopsMouse.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://OopsMouse.github.io/"/>
-  <updated>2013-11-18T21:54:45+09:00</updated>
+  <updated>2013-11-22T01:05:38+09:00</updated>
   <id>http://OopsMouse.github.io/</id>
   <author>
     <name><![CDATA[Noda Shimpei]]></name>
@@ -12,6 +12,71 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS7でUIWebViewにloadRequestしても、ページが表示されない]]></title>
+    <link href="http://OopsMouse.github.io/blog/2013/11/22/title/"/>
+    <updated>2013-11-22T00:39:00+09:00</updated>
+    <id>http://OopsMouse.github.io/blog/2013/11/22/title</id>
+    <content type="html"><![CDATA[<p>iOS7の対応をしていて、気づいたメモ。UIWebViewをメンバとして持つUIViewControllerの継承クラスをStoryboardなどで作成していて、下記のようにインスタンスメソッドを経由してUIWebViewにNSURLRequestオブジェクトを渡して該当のページを表示させようとすると、iOS6では正常に動いていたものがiOS7では何も表示されないという問題。</p>
+
+<pre><code>@interface UIWebViewController: UIViewController {
+    IBOutlet UIWebView *_webView;
+}
+
+- (void)loadRequest:(NSURLRequest *)request;
+
+@end
+
+@implementation UIWebViewController
+
+- (void)loadRequest:(NSURLRequest *)request {
+    [_webView loadRequest:request];
+}
+
+@end
+
+~~~~~~
+
+UIWebViewController *webViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"UIWebViewController"];
+[[self navigationController] pushViewController:webViewController];
+[webViewController loadRequest:request];
+</code></pre>
+
+<p>どうやら、iOS7からUIViewControllerのライフサイクルが変更されたのか、[[self navigationController] pushViewController:webViewController]を実行してもすぐにviewDidLoadが実行されずに[webViewController loadRequest:request]が実行されているようだ。<br/>
+結局、iOS7のライフサイクルにも対応するように、下記のようにUIWebViewControllerを変更した。</p>
+
+<pre><code>@interface UIWebViewController: UIViewController {
+    IBOutlet UIWebView *_webView;
+    NSURLRequest *_bufferedRequest;
+}
+
+- (void)loadRequest:(NSURLRequest *)request;
+
+@end
+
+@implementation UIWebViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    if (_bufferedRequest) {
+        [_webView loadRequest:request];
+        _bufferedRequest = nil;
+    }
+}
+
+- (void)loadRequest:(NSURLRequest *)request {
+    if (_webView) {
+        [_webView loadRequest:request];
+    } else {
+        _bufferedRequest = request;
+    }
+}
+
+@end
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[NSURLComponentsの使い方]]></title>

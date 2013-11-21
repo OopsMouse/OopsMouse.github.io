@@ -9,7 +9,7 @@
 	<meta name="author" content="Noda Shimpei">
 
 	
-	<meta name="description" content="Nov 18th, 2013 ios NSURLComponentsの使い方 iOS7からNSDateComponentsのように、NSURLのフォーマットを決めるNSURLComponentsというクラスが追加された。下記のようにURLを定義する部分がすっきりかける。 &hellip;">
+	<meta name="description" content="Nov 22nd, 2013 ios iOS7でUIWebViewにloadRequestしても、ページが表示されない iOS7の対応をしていて、気づいたメモ。UIWebViewをメンバとして持つUIViewControllerの継承クラスをStoryboardなどで作成していて、 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -97,6 +97,97 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-22T00:39:00+09:00" data-updated="true" itemprop="datePublished">Nov 22<span>nd</span>, 2013</time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2013/11/22/title/" itemprop="url">iOS7でUIWebViewにloadRequestしても、ページが表示されない</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>iOS7の対応をしていて、気づいたメモ。UIWebViewをメンバとして持つUIViewControllerの継承クラスをStoryboardなどで作成していて、下記のようにインスタンスメソッドを経由してUIWebViewにNSURLRequestオブジェクトを渡して該当のページを表示させようとすると、iOS6では正常に動いていたものがiOS7では何も表示されないという問題。</p>
+
+<pre><code>@interface UIWebViewController: UIViewController {
+    IBOutlet UIWebView *_webView;
+}
+
+- (void)loadRequest:(NSURLRequest *)request;
+
+@end
+
+@implementation UIWebViewController
+
+- (void)loadRequest:(NSURLRequest *)request {
+    [_webView loadRequest:request];
+}
+
+@end
+
+~~~~~~
+
+UIWebViewController *webViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"UIWebViewController"];
+[[self navigationController] pushViewController:webViewController];
+[webViewController loadRequest:request];
+</code></pre>
+
+<p>どうやら、iOS7からUIViewControllerのライフサイクルが変更されたのか、[[self navigationController] pushViewController:webViewController]を実行してもすぐにviewDidLoadが実行されずに[webViewController loadRequest:request]が実行されているようだ。<br/>
+結局、iOS7のライフサイクルにも対応するように、下記のようにUIWebViewControllerを変更した。</p>
+
+<pre><code>@interface UIWebViewController: UIViewController {
+    IBOutlet UIWebView *_webView;
+    NSURLRequest *_bufferedRequest;
+}
+
+- (void)loadRequest:(NSURLRequest *)request;
+
+@end
+
+@implementation UIWebViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    if (_bufferedRequest) {
+        [_webView loadRequest:request];
+        _bufferedRequest = nil;
+    }
+}
+
+- (void)loadRequest:(NSURLRequest *)request {
+    if (_webView) {
+        [_webView loadRequest:request];
+    } else {
+        _bufferedRequest = request;
+    }
+}
+
+@end
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
