@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ios | Wannabe Notes]]></title>
   <link href="http://OopsMouse.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://OopsMouse.github.io/"/>
-  <updated>2013-11-22T01:05:38+09:00</updated>
+  <updated>2013-11-22T21:58:54+09:00</updated>
   <id>http://OopsMouse.github.io/</id>
   <author>
     <name><![CDATA[Noda Shimpei]]></name>
@@ -12,6 +12,20 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS6でiPadの画面回転固定をshouldAutorotateで行えない問題]]></title>
+    <link href="http://OopsMouse.github.io/blog/2013/11/22/title2/"/>
+    <updated>2013-11-22T21:45:00+09:00</updated>
+    <id>http://OopsMouse.github.io/blog/2013/11/22/title2</id>
+    <content type="html"><![CDATA[<p>すでにiOS7がリリースされてが、まだiOS6には対応しなければいけないアプリも多いはず。少しハマったiOS6のバグの話をします。<br/>
+iPadではLandscapeでも利用できる画面とPortraitだけで利用できる画面が混じったアプリの場合、Info.plistでPortraitもLandscapeも利用可としておいて、各画面でshouldAutorotateとsupportedInterfaceOrientationsにて制御します。しかし、iOS6にはバグがあり、このような状況下でアプリを起動した最初のページをPortraitのみにしたい場合（つまり、最初のページでshouldAutorotateでNOを返すようにしていた場合）、iPadの画面をLandscapeモードにしてアプリを起動したときに画面はPortrait, StatusBarだけLandscapeになるといったバグがあります。<br/>
+これを回避するためには、下記のコードをapplication:didFinishLaunchingWithOptionsの先頭で呼ぶ必要があります。</p>
+
+<pre><code>[[UIApplication sharedApplication]setStatusBarOrientation:UIInterfaceOrientationPortrait];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS7でUIWebViewにloadRequestしても、ページが表示されない]]></title>

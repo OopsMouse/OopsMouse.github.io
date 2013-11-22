@@ -9,7 +9,7 @@
 	<meta name="author" content="Noda Shimpei">
 
 	
-	<meta name="description" content="Nov 22nd, 2013 ios iOS7でUIWebViewにloadRequestしても、ページが表示されない iOS7の対応をしていて、気づいたメモ。UIWebViewをメンバとして持つUIViewControllerの継承クラスをStoryboardなどで作成していて、 &hellip;">
+	<meta name="description" content="Nov 22nd, 2013 ios iOS6でiPadの画面回転固定をshouldAutorotateで行えない問題 すでにiOS7がリリースされてが、まだiOS6には対応しなければいけないアプリも多いはず。少しハマったiOS6のバグの話をします。 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -97,6 +97,46 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-22T21:45:00+09:00" data-updated="true" itemprop="datePublished">Nov 22<span>nd</span>, 2013</time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2013/11/22/title2/" itemprop="url">iOS6でiPadの画面回転固定をshouldAutorotateで行えない問題</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>すでにiOS7がリリースされてが、まだiOS6には対応しなければいけないアプリも多いはず。少しハマったiOS6のバグの話をします。<br/>
+iPadではLandscapeでも利用できる画面とPortraitだけで利用できる画面が混じったアプリの場合、Info.plistでPortraitもLandscapeも利用可としておいて、各画面でshouldAutorotateとsupportedInterfaceOrientationsにて制御します。しかし、iOS6にはバグがあり、このような状況下でアプリを起動した最初のページをPortraitのみにしたい場合（つまり、最初のページでshouldAutorotateでNOを返すようにしていた場合）、iPadの画面をLandscapeモードにしてアプリを起動したときに画面はPortrait, StatusBarだけLandscapeになるといったバグがあります。<br/>
+これを回避するためには、下記のコードをapplication:didFinishLaunchingWithOptionsの先頭で呼ぶ必要があります。</p>
+
+<pre><code>[[UIApplication sharedApplication]setStatusBarOrientation:UIInterfaceOrientationPortrait];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
